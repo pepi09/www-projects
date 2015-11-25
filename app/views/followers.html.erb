@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>Followers | Tweeter</title>
+  </head>
+  <body>
+    <ul>
+      <% @followers.each do |follower| %>
+      <li><%= follower.full_name %></li>
+      <% end %>
+    </ul>
+  </body>
+</html>

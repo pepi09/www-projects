@@ -52,7 +52,7 @@ module UserRepository
       SELECT email, username, first_name, last_name, location FROM users
       JOIN users_followers
       ON users.id = users_followers.follower_id
-      WHERE users_followers.followed_id = #{1};
+      WHERE users_followers.followed_id = #{id};
     SQL
 
     return unless rows
@@ -71,5 +71,35 @@ module UserRepository
   end
 
   def following(id)
+    columns, *rows = DB.execute2 <<-SQL
+      SELECT email, username, first_name, last_name, location FROM users
+      JOIN users_followers
+      ON users.id = users_followers.followed_id
+      WHERE users_followers.follower_id = #{id};
+    SQL
+
+    return unless rows
+
+    rows.map do |row|
+      user_attributes = columns.zip(row).to_h
+
+      User.new(
+        user_attributes['email'],
+        user_attributes['username'],
+        user_attributes['first_name'],
+        user_attributes['last_name'],
+        user_attributes['location'],
+      )
+    end
+  end
+  
+  def follow(follower_id, followed_id)
+    DB.execute <<-SQL
+    INSERT INTO users_followers (
+        `follower_id`, `followed_id`
+      ) VALUES (
+        '#{follower_id}', '#{followed_id}'
+      );
+    SQL
   end
 end

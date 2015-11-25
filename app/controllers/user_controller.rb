@@ -1,6 +1,7 @@
 require 'erb'
 
-require './models/user'
+require './app/models/user'
+require './app/repositories/user_repository'
 
 USERS = {
   1 => User.new('foo', 'foo@example.com', 'Foo', 'Yeah', 'Fooland'),
@@ -20,18 +21,18 @@ USER_FOLLOWING = {
 }
 
 class UserController
-  def show
-    @user = USERS[params[:id]]
+  def show(id)
+    @user = UserRepository.find(id)
     render :show
   end
 
-  def followers
-    @followers = USER_FOLLOWERS[params[:id]].map { |follower_id| USERS[follower_id] }
+  def followers(id)
+    @followers = UserRepository.followers(id)
     render :followers
   end
 
-  def following
-    @following = USER_FOLLOWING[params[:id]].map { |following_id| USERS[following_id] }
+  def following(id)
+    @following = UserRepository.following(id)
     render :following
   end
 
@@ -42,7 +43,7 @@ class UserController
   end
 
   def render(view_path)
-    view_content = File.read("./views/#{view_path}.html.erb")
+    view_content = File.read("./app/views/#{view_path}.html.erb")
     ERB.new(view_content).result(binding)
   end
 end
