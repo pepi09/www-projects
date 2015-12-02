@@ -21,13 +21,7 @@ module UserRepository
     return unless row
 
     user_attributes = columns.zip(row).to_h
-    User.new(
-      user_attributes['email'],
-      user_attributes['username'],
-      user_attributes['first_name'],
-      user_attributes['last_name'],
-      user_attributes['location'],
-    )
+    wrap_user(user_attributes)
   end
 
   def update(user)
@@ -49,7 +43,7 @@ module UserRepository
 
   def followers(id)
     columns, *rows = DB.execute2 <<-SQL
-      SELECT email, username, first_name, last_name, location FROM users
+      SELECT users.id AS id, email, username, first_name, last_name, location FROM users
       JOIN users_followers
       ON users.id = users_followers.follower_id
       WHERE users_followers.followed_id = #{id};
@@ -60,19 +54,13 @@ module UserRepository
     rows.map do |row|
       user_attributes = columns.zip(row).to_h
 
-      User.new(
-        user_attributes['email'],
-        user_attributes['username'],
-        user_attributes['first_name'],
-        user_attributes['last_name'],
-        user_attributes['location'],
-      )
+      wrap_user(user_attributes)
     end
   end
 
   def following(id)
     columns, *rows = DB.execute2 <<-SQL
-      SELECT email, username, first_name, last_name, location FROM users
+      SELECT users.id AS id, email, username, first_name, last_name, location FROM users
       JOIN users_followers
       ON users.id = users_followers.followed_id
       WHERE users_followers.follower_id = #{id};
@@ -83,13 +71,7 @@ module UserRepository
     rows.map do |row|
       user_attributes = columns.zip(row).to_h
 
-      User.new(
-        user_attributes['email'],
-        user_attributes['username'],
-        user_attributes['first_name'],
-        user_attributes['last_name'],
-        user_attributes['location'],
-      )
+      wrap_user(user_attributes)
     end
   end
   
@@ -101,5 +83,16 @@ module UserRepository
         '#{follower_id}', '#{followed_id}'
       );
     SQL
+  end
+  
+  def wrap_user(user_attributes)
+    User.new(
+        user_attributes['username'],
+        user_attributes['email'],
+        user_attributes['first_name'],
+        user_attributes['last_name'],
+        user_attributes['location'],
+        user_attributes['id'],
+      )
   end
 end

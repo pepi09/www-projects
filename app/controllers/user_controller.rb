@@ -27,13 +27,19 @@ class UserController
   end
 
   def followers(id)
+    @user = UserRepository.find(id)
     @followers = UserRepository.followers(id)
     render :followers
   end
 
   def following(id)
+    @user = UserRepository.find(id)
     @following = UserRepository.following(id)
     render :following
+  end
+  
+  def register
+    render :register
   end
 
   private

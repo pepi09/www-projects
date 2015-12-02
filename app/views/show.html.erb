@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <html>
   <head>
-  <title><%= @user.full_name %> | Tweeter</title>
+    <title><%= @user.full_name %> | Tweeter</title>
   </head>
   <body>
-    content
-    <p>I'm a new content!</p>
+    <nav>
+      <a href="/show?id=<%= @user.id %>">Home</a>
+      <a href="/followers?id=<%= @user.id %>">Followers</a>
+      <a href="/following?id=<%= @user.id %>">Following</a>
+      <a href="/register">Register</a>
+    </nav>
+    <h1>Profile</h1>
+    <p>
+      <img src="http://www.projectiv.co/wp-content/uploads/2013/12/placeholder.png" alt="Profile picture"/>
+      <p><%= @user.full_name %></p>
+      <p>@<%= @user.username %></p>
+      <p>location: <%= @user.location %></p>
+    </p>
   </body>
 </html>
