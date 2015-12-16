@@ -49,4 +49,5 @@ module Tweeter
   end
 end
 
+use Rack::Static, :urls => ["/css", "/images"], :root => "app/views"
 run Tweeter::Application
