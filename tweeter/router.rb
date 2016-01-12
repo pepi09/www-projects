@@ -1,33 +1,22 @@
 module Tweeter
   class Router
-      ROUTES = {
-          get: {
-              '/' => 'user#show',
-              '/show' => 'user#show',
-              '/following' => 'user#following',
-              '/followers' => 'user#followers',
-          },
-          post: {
-            '/test' => 'user#test'  
-          },
-      }
-      
-      def initialize(controller_registry)
+      def initialize(controller_registry, routes)
+          @routes = routes
           @controller_registry = controller_registry
       end
       
       def call(env)
           post_hash = {}
           query_hash = {}
-          if env['rack.input'].gets
+          if post_data = env['rack.input'].gets
               request_method = :post
-              post_hash = split_query(env['rack.input'].gets)
+              post_hash = split_query(post_data || "")
           else
               request_method = :get
-              query_hash = split_query(env['QUERY_STRING'])
+              query_hash = split_query(env['QUERY_STRING'] || "")
           end
           
-          if (mapping = ROUTES[request_method][env['PATH_INFO']])
+          if (mapping = @routes[request_method][env['PATH_INFO']])
             controller_and_action = controller_action(request_method.to_s, mapping)
             controller = @controller_registry.get_controller controller_and_action['controller']
             Rack::Response.new controller.send(controller_and_action['action'], query_hash, post_hash)

@@ -22,27 +22,33 @@ USER_FOLLOWING = {
 
 class UserController
   def get_show(query_hash, post_hash)
-    p query_hash
-    p post_hash
-    @user = UserRepository.find(query_hash['id'])
-    puts 'will_now_render'
+    id = query_hash['id'] || 1
+    @user = UserRepository.find(id)
     render :show
   end
 
-  def followers(id)
+  def get_followers(query_hash, post_hash)
+    id = query_hash['id'] || 1
     @user = UserRepository.find(id)
     @followers = UserRepository.followers(id)
     render :followers
   end
 
-  def following(id)
+  def get_following(query_hash, post_hash)
+    id = query_hash['id'] || 1
     @user = UserRepository.find(id)
     @following = UserRepository.following(id)
     render :following
   end
   
-  def register
+  def get_register(query_hash, post_hash)
     render :register
+  end
+  
+  def post_register(query_hash, post_hash)
+    p post_hash
+    user = User.new(post_hash['username'], post_hash['email'], post_hash['first_name'], post_hash['last_name'], nil)
+    UserRepository.create(user)
   end
 
   private
