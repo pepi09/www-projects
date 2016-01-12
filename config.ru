@@ -1,10 +1,12 @@
 # config.ru
 require 'rack'
 require './app/controllers/user_controller'
+require './tweeter/controller_registry'
+require './tweeter/router'
 
 module Tweeter
   class Application
-    def self.call(env)
+    def call(env)
       controller = ::UserController.new
       query_string = env['QUERY_STRING']
       query_hash = split_query(query_string)
@@ -36,7 +38,7 @@ module Tweeter
       end
     end
     
-    def self.split_query(query_string)
+    def split_query(query_string)
       query_string.split('&').map do |query|
         split_array = query.split '='
         if split_array.count == 1
@@ -50,4 +52,17 @@ module Tweeter
 end
 
 use Rack::Static, :urls => ["/css", "/images"], :root => "app/views"
-run Tweeter::Application
+# run Tweeter::Application
+
+use Rack::Session::Pool
+
+controller_registry = Tweeter::ControllerRegistry.new
+controller_registry.add_controller 'user' => UserController.new
+myapp = Tweeter::Router.new controller_registry
+
+sessioned = Rack::Session::Pool.new(myapp,
+  #:domain => '0.0.0.0',
+  :expire_after => 2592000
+)
+
+run sessioned

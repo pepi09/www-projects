@@ -21,8 +21,11 @@ USER_FOLLOWING = {
 }
 
 class UserController
-  def show(id)
-    @user = UserRepository.find(id)
+  def get_show(query_hash, post_hash)
+    p query_hash
+    p post_hash
+    @user = UserRepository.find(query_hash['id'])
+    puts 'will_now_render'
     render :show
   end
 
