@@ -8,7 +8,6 @@ CREATE TABLE users (
 );
 
 CREATE TABLE users_followers (
-  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   followed_id INTEGER NOT NULL,
   follower_id INTEGER NOT NULL,
   FOREIGN KEY(followed_id) REFERENCES users(id),
