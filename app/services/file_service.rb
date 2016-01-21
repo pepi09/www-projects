@@ -1,6 +1,6 @@
 module Tweeter
     class FileService
-        LOCATON = 'app/public/'
+        LOCATON = 'app/public/uploads/'
         
         def self.transfer(temp_file, filename)
             timestamp = Time.now.utc.iso8601
