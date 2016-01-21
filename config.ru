@@ -1,13 +1,23 @@
 # config.ru
 require 'rack'
-require './app/controllers/user_controller'
+require 'erb'
+require 'sqlite3'
+require 'time'
+
+
+require './tweeter/controller/base_controller'
 require './tweeter/controller_registry'
 require './tweeter/router'
 
-module Tweeter
-  class Application
-  end
-end
+require './app/models/user'
+require './app/repositories/user_repository'
+require './app/services/file_service'
+require './app/controllers/user_controller'
+require './app/controllers/login_controller'
+require './app/controllers/upload_controller'
+
+DB = SQLite3::Database.new './db/database.sqlite3'
+
 
 ROUTES = {
           get: {
@@ -15,23 +25,28 @@ ROUTES = {
               '/show' => 'user#show',
               '/following' => 'user#following',
               '/followers' => 'user#followers',
-              '/register' => 'user#register'
+              '/register' => 'user#register',
+              '/login' => 'login#login',
+              '/logout' => 'login#logout',
+              '/upload' => 'upload#upload',
           },
           post: {
-            '/register' => 'user#register'  
+            '/register' => 'user#register',
+            '/login' => 'login#login',
+            '/upload' => 'upload#upload',
           },
       }
 
-use Rack::Static, :urls => ["/css", "/images"], :root => "app/views"
-# run Tweeter::Application
-
+use Rack::Static, :urls => ["/css", "/images", "/uploads"], :root => "app/public"
 use Rack::Session::Pool
 
 controller_registry = Tweeter::ControllerRegistry.new
-controller_registry.add_controller 'user' => UserController.new
-myapp = Tweeter::Router.new controller_registry, ROUTES
+controller_registry.add_controllers('user' => Tweeter::UserController.new(),
+                                   'login' => Tweeter::LoginController.new(),
+                                   'upload' => Tweeter::UploadController.new())
+router = Tweeter::Router.new controller_registry, ROUTES
 
-sessioned = Rack::Session::Pool.new(myapp,
+sessioned = Rack::Session::Pool.new(router,
   #:domain => '0.0.0.0',
   :expire_after => 2592000
 )

@@ -4,7 +4,7 @@ module Tweeter
           @controllers = {}
       end
       
-      def add_controller(controller_hash)
+      def add_controllers(controller_hash)
           @controllers.merge! controller_hash
       end
       

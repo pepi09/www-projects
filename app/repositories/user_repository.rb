@@ -1,8 +1,3 @@
-require 'sqlite3'
-require './app/models/user'
-
-DB = SQLite3::Database.new './db/database.sqlite3'
-
 module UserRepository
   extend self
 
@@ -18,6 +13,14 @@ module UserRepository
 
   def find(id)
     columns, row = DB.execute2 "SELECT * FROM users WHERE id = #{id};"
+    return unless row
+
+    user_attributes = columns.zip(row).to_h
+    wrap_user(user_attributes)
+  end
+  
+  def find_by_username(username)
+    columns, row = DB.execute2 "SELECT * FROM users WHERE username LIKE '#{username}';"
     return unless row
 
     user_attributes = columns.zip(row).to_h
